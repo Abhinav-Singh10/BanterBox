@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
-import { ButtonHTMLAttributes, FC } from "react";
+import { ButtonHTMLAttributes, FC } from "react"; // Little bit on this FC here, since we are in typeScript , react has provided the FC Typescript type to us which stands for
+// functional component. This helps as it comes with defualt props like children, helps in autocomplition and foremost it ensures that the component returns JSX or null
 
 // class variance authority allows me to have variants of my buttton
 const butttonVariants = cva(
@@ -35,9 +36,28 @@ export interface ButtonProps
   isLoading?: boolean;
 }
 
+
+
+// The code below could have been written in this format as well:
+// const page = ({}: ButtonProps) => {
+//   return <div>page</div>
+// }
+
+// Like: this is an example where i have not used the FC type from react, instead directly stated the expected type of props, but for this to work i will need to change
+// the ButtonProps Interface as some default classes like children won't be defined that come from the FC type provided by react.
+
+// const Button = ({
+//   className,
+//   children,
+//   variant,
+//   isLoading,
+//   size,
+//   ...props
+// }: ButtonProps) => {
+
 // we are destructuring props here
 // ...props here is catch all , for all the other properties that we are not destructuring
-const Button: FC<ButtonProps> = ({
+const Button: FC<ButtonProps> = ({ 
   className,
   children,
   variant,

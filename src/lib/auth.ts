@@ -79,7 +79,7 @@ export const authOptions: NextAuthOptions={
             return session;
         },
         // This section is for when the user has signed in and we want to redirect them
-        redirect(){ // this expects a sting
+        redirect(){ // this expects a string
             return '/dashboard'  // the place to redirect after a sucessful login
         }
 
