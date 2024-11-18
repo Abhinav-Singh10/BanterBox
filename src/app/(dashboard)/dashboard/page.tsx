@@ -1,15 +1,15 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { FC } from "react";
+import { json } from "stream/consumers";
 
-interface pageProps{}
 
-const page: FC<pageProps>= async ({})=>{
+const page = async ({})=>{
 // We will authenticate the user
 
 const session= await getServerSession(authOptions)
-
-    return <pre>page</pre>
+    
+    return <pre>{JSON.stringify(session)}</pre>
 }
 
 export default page;

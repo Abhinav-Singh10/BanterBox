@@ -1,15 +1,15 @@
 "use client";
 
-import { FC, useState } from "react";
-import Button from "./Button";
 import { addFriendValidator } from "@/lib/validations/add-friend";
 import axios, { AxiosError } from "axios";
+import { FC, useState } from "react";
+import Button from "./Button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { error } from "console";
 
 interface AddFriendButtonProps {}
+
 type FormData = z.infer<typeof addFriendValidator>;
 
 // We'll handle user input using react hook forms
@@ -24,9 +24,9 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
   const {
     // We can destructure this register property that useForm provides us, and assign it to our input field for validation
     register,
-    handleSubmit, // prevents default and i also can pass in a function 
+    handleSubmit, // prevents default and i also can pass in a function
     setError, // very useful to get type of error against our zod validation or any field inside our zod schema
-    formState:{errors} // this is to get acces to error to diplay messages 
+    formState: { errors }, // this is to get acces to error to diplay messages
   } = useForm<FormData>({
     resolver: zodResolver(addFriendValidator),
   });
@@ -34,10 +34,7 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
   const addFriend = async (email: string) => {
     try {
       // If the user gives out wrong input, we should make sure that they can't make a request, using zod for input validation
-      console.log("Reached");
-      const validatedEmail = addFriendValidator.parse({ email });
-
-      
+      const validatedEmail = addFriendValidator.parse({email});
 
       await axios.post("/api/friends/add", {
         email: validatedEmail,
@@ -48,16 +45,14 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
       // Since in case response other than 200, we don't know what error might be there , but we do know that it would be an instance of the class
       if (error instanceof z.ZodError) {
         // since the error is of type zod error we know it will come with a message (error.message)
-        setError("email", { message: error.message+"ZOd" });
-        console.log("zod error");
-        
+        setError("email", { message: error.message });
+
         return;
       }
-      
+
       if (error instanceof AxiosError) {
         // setting it optional in case the error comes with no response from axios
-        setError("email", { message: error.response?.data+"Axios Error" });
-        console.log("axios error");
+        setError("email", { message: error.response?.data });
         return;
       }
 
@@ -65,9 +60,9 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
     }
   };
 
-  const onSubmit= (data: FormData) =>{
-    addFriend(data.email)
-  }
+  const onSubmit = (data: FormData) => {
+    addFriend(data.email);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-sm bg-pink-400">
@@ -91,8 +86,10 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
         <Button>Add</Button>
       </div>
       <p className="mt-1 text-sm text-red-600">{errors.email?.message}</p>
-      
-      {showSuccessState? (<p className="mt-1 text-sm text-green-600">Friend Request Sent 😃</p>) : null}
+
+      {showSuccessState ? (
+        <p className="mt-1 text-sm text-green-600">Friend Request Sent 😃</p>
+      ) : null}
     </form>
   );
 };

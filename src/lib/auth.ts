@@ -4,6 +4,7 @@ import { NextAuthOptions } from "next-auth";
 import { UpstashRedisAdapter } from "@next-auth/upstash-redis-adapter";
 import { db } from "./db";
 import GoogleProvider from "next-auth/providers/google";
+import { fetchRedis } from "@/helpers/redis";
 
 // helper function to get local googleCreds
 function getGoogleCredentials(){
@@ -48,14 +49,17 @@ export const authOptions: NextAuthOptions={
         // here we explicitly make jwt key async
         async jwt({token,user}){ // token and user are automatically provided by the next auth
             // Checking if there is any user in our database
-            const dbUser= (await db.get(`user: ${token.id}`)) as User | null// this token.id variable authomatically generated up the UpstashRedisApapter
+                const dbUserResult = (await fetchRedis('get', `user:${token.id}`)) as
+                  | string
+                  | null// this token.id variable authomatically generated up the UpstashRedisApapter
 
-            if(!dbUser){
+            if(!dbUserResult){
                 // Since there is no previous user in our db we assign a new token for the current user
                 token.id= user!.id // ! means the user must exist 
                 return token
             }
 
+            const dbUser = JSON.parse(dbUserResult) as User
             // if the User does exist then 
             return {
                 id: dbUser.id,
@@ -68,10 +72,10 @@ export const authOptions: NextAuthOptions={
         async session({session,token}){ // session,token from nextAuth
             
             if(token){
-                session.user.id=token.id
-            // after defining the next auth defining file , now what values the token can have are known
-            // In these lines above and below we are appending the values that the token has access to on to the session, this is so that we have access to these values
-            // throughtout the session
+                // after defining the next auth defining file , now what values the token can have are known
+                // In these lines above and below I am appending the values that the token has access to on to the session, this is so that we have access to these values
+                // throughtout the session
+            session.user.id=token.id
             session.user.name= token.name
             session.user.email= token.email
             session.user.image= token.picture

@@ -2,7 +2,6 @@ import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { addFriendValidator } from "@/lib/validations/add-friend";
-import { Session } from "inspector/promises";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 
@@ -14,19 +13,6 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const { email: emailToAdd } = addFriendValidator.parse(body.email);
-
-    // I need to prevent nextjs 13th caching (on api routes) behaviour here by using the cache: 'no-store' flag
-    const RESTResponse = await fetch(
-      `${process.env.UPSTASH_REDIS_REST_URL}/get/user:email:${emailToAdd}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN},
-          {
-            cache:'no-store'
-        }`,
-        },
-      }
-    );
 
     const idToAdd = (await fetchRedis(
       'get', // this will give me the id of the email i wanna sent friend request to
